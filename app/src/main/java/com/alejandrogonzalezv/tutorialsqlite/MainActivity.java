@@ -23,7 +23,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private ListView lista;
     private SimpleCursorAdapter adapter;
     private EditText Ednombre;
-    private Button btnbuscar;
+    //private Button btnbuscar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +32,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         Manager = new DataBaseManager(this);
 
-        Manager.insertar("Alejo","5822128");
-        Manager.insertar("Pablo","2651752");
-        Manager.insertar("Paula","4910413");
+        //Manager.insertar("Alejo","5822128");
+        //Manager.insertar("Pablo","2651752");
+        //Manager.insertar("Paula","4910413");
+        Button btnbuscar = (Button) findViewById(R.id.btn1);
+        btnbuscar.setOnClickListener(this);
+        Button btncargar = (Button) findViewById(R.id.btndb);
+        btncargar.setOnClickListener(this);
+        Button btninsertar = (Button) findViewById(R.id.btninsertar);
+        btninsertar.setOnClickListener(this);
 
-        lista = (ListView) findViewById(android.R.id.list);
-        Ednombre = (EditText) findViewById(R.id.EdText1);
-        btnbuscar = (Button) findViewById(R.id.btn1);
-            btnbuscar.setOnClickListener(this);
 
-        String[] from = new String[]{Manager.CN_NAME,Manager.CN_PHONE};
-        int[] to = new int[]{android.R.id.text1,android.R.id.text2};
-        cursor = Manager.cargarCursorContactos();
-        adapter = new SimpleCursorAdapter(this,android.R.layout.two_line_list_item,cursor,from,to,0);
-        lista.setAdapter(adapter);
+
     }
 
 
@@ -76,6 +74,23 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId()==R.id.btn1){
             new BuscarTask().execute();
+        }
+        if(v.getId()==R.id.btndb){
+            lista = (ListView) findViewById(android.R.id.list);
+            Ednombre = (EditText) findViewById(R.id.EdText1);
+
+
+            String[] from = new String[]{Manager.CN_NAME,Manager.CN_PHONE};
+            int[] to = new int[]{android.R.id.text1,android.R.id.text2};
+            cursor = Manager.cargarCursorContactos();
+            adapter = new SimpleCursorAdapter(this,android.R.layout.two_line_list_item,cursor,from,to,0);
+            lista.setAdapter(adapter);
+
+        }
+        if (v.getId()==R.id.btninsertar){
+            EditText nombre = (EditText) findViewById(R.id.EdNombre);
+            EditText telefono = (EditText) findViewById(R.id.EdTelefono);
+            Manager.insertar(nombre.getText().toString(),telefono.getText().toString());
         }
     }
 
