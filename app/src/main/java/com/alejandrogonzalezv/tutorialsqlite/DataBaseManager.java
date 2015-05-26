@@ -6,6 +6,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.sql.SQLException;
+
 /**
  * Created by Alejandro on 24/05/2015.
  */
@@ -46,13 +48,22 @@ public class DataBaseManager {
         return db.query(TABLE_NAME,columnas,null,null,null,null,null);
     }
 
-    public Cursor buscarContacto(String Nombre){
+    public void eliminar(String nombre){
+        db.delete(TABLE_NAME,CN_NAME + "=?", new String[]{nombre});
+    }
+
+    public void ModificarTelefono(String nombre, String nuevotelefono){
+        db.update(TABLE_NAME,generarContentValues(nombre,nuevotelefono),CN_NAME+"=?",new String[]{nombre});
+    }
+
+    public Cursor buscarContacto(String Nombre) {
         String [] columnas = new String[]{CN_ID,CN_NAME,CN_PHONE};
         try {
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
         return db.query(TABLE_NAME,columnas,CN_NAME + "=?",new String[]{Nombre},null,null,null);
     }
 }

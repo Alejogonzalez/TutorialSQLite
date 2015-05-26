@@ -1,6 +1,7 @@
 package com.alejandrogonzalezv.tutorialsqlite;
 
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
@@ -12,8 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.TooManyListenersException;
 
 
@@ -31,6 +34,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         Manager = new DataBaseManager(this);
+        lista = (ListView) findViewById(android.R.id.list);
+        Ednombre = (EditText) findViewById(R.id.EdText1);
+
+        String[] from = new String[]{Manager.CN_NAME,Manager.CN_PHONE};
+        int[] to = new int[]{android.R.id.text1,android.R.id.text2};
+        cursor = Manager.cargarCursorContactos();
+        adapter = new SimpleCursorAdapter(this,android.R.layout.two_line_list_item,cursor,from,to,0);
+        lista.setAdapter(adapter);
 
         //Manager.insertar("Alejo","5822128");
         //Manager.insertar("Pablo","2651752");
@@ -41,6 +52,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         btncargar.setOnClickListener(this);
         Button btninsertar = (Button) findViewById(R.id.btninsertar);
         btninsertar.setOnClickListener(this);
+        Button btneliminar = (Button) findViewById(R.id.btneliminar);
+        btneliminar.setOnClickListener(this);
+        Button btnactualizar = (Button) findViewById(R.id.btnactualizar);
+        btnactualizar.setOnClickListener(this);
 
 
 
@@ -79,7 +94,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             lista = (ListView) findViewById(android.R.id.list);
             Ednombre = (EditText) findViewById(R.id.EdText1);
 
-
             String[] from = new String[]{Manager.CN_NAME,Manager.CN_PHONE};
             int[] to = new int[]{android.R.id.text1,android.R.id.text2};
             cursor = Manager.cargarCursorContactos();
@@ -91,6 +105,23 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             EditText nombre = (EditText) findViewById(R.id.EdNombre);
             EditText telefono = (EditText) findViewById(R.id.EdTelefono);
             Manager.insertar(nombre.getText().toString(),telefono.getText().toString());
+            nombre.setText("");
+            telefono.setText("");
+            Toast.makeText(getApplicationContext(),"Insertado", Toast.LENGTH_SHORT).show();
+        }
+        if(v.getId()==R.id.btneliminar){
+            EditText nombre = (EditText) findViewById(R.id.EdNombre);
+            Manager.eliminar(nombre.getText().toString());
+            Toast.makeText(getApplicationContext(),"Eliminado", Toast.LENGTH_SHORT).show();
+            nombre.setText("");
+        }
+        if (v.getId()==R.id.btnactualizar){
+            EditText nombre = (EditText) findViewById(R.id.EdNombre);
+            EditText telefono = (EditText) findViewById(R.id.EdTelefono);
+            Manager.ModificarTelefono(nombre.getText().toString(),telefono.getText().toString());
+            Toast.makeText(getApplicationContext(),"Actualizado", Toast.LENGTH_SHORT).show();
+            nombre.setText("");
+            telefono.setText("");
         }
     }
 
@@ -113,6 +144,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         protected void onPostExecute(Void aVoid) {
             Toast.makeText(getApplicationContext(),"Finalizado", Toast.LENGTH_SHORT).show();
             adapter.changeCursor(cursor);
+            obtener();
         }
+    }
+
+    public void obtener () {
+        TextView Txnombre = (TextView) findViewById(R.id.Txnombre);
+        TextView Txtelefono = (TextView) findViewById(R.id.Txtelefono);
+        try{
+                String dbnombre = cursor.getString(cursor.getColumnIndex(Manager.CN_NAME));
+                Txnombre.setText(dbnombre);
+                String dbtelefono = cursor.getString(cursor.getColumnIndex(Manager.CN_PHONE));
+                Txtelefono.setText(dbtelefono);}
+        catch(CursorIndexOutOfBoundsException e){
+            Txnombre.setText("No Found");
+            Txtelefono.setText("No Found");
+        }
+
     }
 }
